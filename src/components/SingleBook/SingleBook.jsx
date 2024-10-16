@@ -4,9 +4,10 @@ const SingleBook = ({ books }) => {
 //   console.log(books.authors[0].name)
   return (
     <div>
-      <div className="card bg-base-100 w-96 h-[560px] shadow-xl">
+      <div className="card bg-base-100 md:w-96 md:h-[560px] shadow-xl border">
         <figure>
           <img
+          className=""
             src={`${formats['image/jpeg']}`}
             alt={title}
           />
@@ -21,6 +22,7 @@ const SingleBook = ({ books }) => {
           </div>
         </div>
       </div>
+      
     </div>
   );
 };
