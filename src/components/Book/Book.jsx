@@ -7,16 +7,30 @@ const Book = () => {
   const [genre, setGenre] = useState("all");
   const [isLoading, setIsLoading] = useState(true); //loading
 
+  // //pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  //const count = filteredBooks.length;
+  // // console.log(count);
+  const [itemsPerPage] = useState(10);
+  //const numberOfPages = Math.ceil(count / itemsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const pages = [...Array(totalPages).keys()];
+  // console.log(itemsPerPage)
+
+   //const [totalPages, setTotalPages] = useState(1);
+
+
   useEffect(() => {
-    fetch("https://gutendex.com/books")
+    fetch(`https://gutendex.com/books`)
       .then((res) => res.json())
       .then((data) => {
         setAllBooks(data.results);
         // setItem(data.results);
         setFilteredBooks(data.results);
+        setTotalPages(Math.ceil(data.results.length / itemsPerPage));
         setIsLoading(false);
       });
-  }, []);
+  }, [itemsPerPage]);
 
   const search = (e) => {
     setFilteredBooks(
@@ -26,21 +40,36 @@ const Book = () => {
     );
   };
 
+  useEffect(() =>{
+    const firstItemIndex = currentPage * itemsPerPage;
+    const lastItemIndex = firstItemIndex + itemsPerPage;
+    setFilteredBooks(allBooks.slice(firstItemIndex, lastItemIndex));
+    //setIsLoading(false)
+  },[currentPage, itemsPerPage, allBooks])
+  
+
   // Function to handle genre change and filter books
   const handleGenreChange = (e) => {
     const selectedGenre = e.target.value;
     setGenre(selectedGenre);
 
     if (selectedGenre === "all") {
-      setFilteredBooks(allBooks); // Show all books if 'All Genres' is selected
+      setFilteredBooks(allBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)); // Show all books if 'All Genres' is selected
     } else {
       // Filter books by selected genre
       const filtered = allBooks.filter((book) =>
         book.subjects.some((subject) => subject.includes(selectedGenre))
       );
-      setFilteredBooks(filtered);
+      setFilteredBooks(filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
+      setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     }
   };
+
+  // const handlePageChange = (newPage) => {
+  //   if (newPage > 0 && newPage <= totalPages) {
+  //     setCurrentPage(newPage);
+  //   }
+  // };
 
   return (
     <>
@@ -65,9 +94,9 @@ const Book = () => {
             </label>
           </div>
           {/* Filter */}
-          <div className="flex justify-center my-8">
+          <div className="flex justify-center items-center gap-2 my-8">
             <label htmlFor="genre">Filter by Genre: </label>
-            <select id="genre" value={genre} onChange={handleGenreChange}>
+            <select id="genre" className="select select-info" value={genre} onChange={handleGenreChange}>
               <option value="all">All Genres</option>
               <option value="Fiction">Fiction</option>
               <option value="Fantasy">Fantasy</option>
@@ -90,7 +119,25 @@ const Book = () => {
               <p>No books founds</p>
             )}
           </div>
-          <div className="flex items-center justify-center gap-2 mb-24"></div>
+          <div className="flex items-center justify-center gap-2 mb-24">
+            
+            <button className={`btn btn-info`} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage == 0} >
+              Prev
+            </button>
+
+          {
+            pages.map(page => <button 
+              onClick={() => setCurrentPage(page)}
+              className={`btn btn-info`}
+              key={page}
+              >{page+1}</button>)
+          } 
+
+            <button className={`btn btn-info`} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage == (totalPages - 1)} >
+              Next
+            </button>
+
+          </div>
         </div>
       )}
     </>

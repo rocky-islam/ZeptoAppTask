@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const SingleBook = ({ books }) => {
   const { id, title, formats } = books;
 //   const {name} = books.authors[0];
@@ -18,7 +20,9 @@ const SingleBook = ({ books }) => {
           <p><strong>Authors:</strong> {books.authors[0]?.name || 'No Name'}</p>
           <p><strong>Genre: </strong>{books.subjects?.[0] || 'Unknown'}</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary">Buy Now</button>
+            <Link to={`/details/${id}`}>
+            <button className="btn btn-primary">See Details</button>
+            </Link>
           </div>
         </div>
       </div>

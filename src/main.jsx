@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Roots from './components/Root/Roots.jsx'
 import Book from './components/Book/Book.jsx'
 import ErrorPage from './components/ErrorPage/ErrorPage.jsx'
+import BookDetails from './components/BookDetails/BookDetails.jsx'
 
 
 const router = createBrowserRouter([
@@ -16,6 +17,11 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <Book></Book>
+      },
+      {
+        path: '/details/:id',
+        loader: ({params}) => fetch(`https://gutendex.com/books/${params.id}`),
+        element: <BookDetails></BookDetails>
       }
     ]
   }
