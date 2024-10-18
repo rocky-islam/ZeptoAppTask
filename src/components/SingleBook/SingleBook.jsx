@@ -1,6 +1,7 @@
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const SingleBook = ({ books }) => {
+const SingleBook = ({ books, handleWishlist, handleRemoveWishlist, isBookInWishlist }) => {
   const { id, title, formats } = books;
 //   const {name} = books.authors[0];
 //   console.log(books.authors[0].name)
@@ -19,10 +20,22 @@ const SingleBook = ({ books }) => {
           <p><strong>Book Id:</strong> {id}</p>
           <p><strong>Authors:</strong> {books.authors[0]?.name || 'No Name'}</p>
           <p><strong>Genre: </strong>{books.subjects?.[0] || 'Unknown'}</p>
-          <div className="card-actions justify-end">
+          <div className="card-actions justify-between items-center">
+            {
+              isBookInWishlist(id) ? <button onClick={() => handleRemoveWishlist(id)} className="btn btn-warning">Remove</button> 
+              :
+              <button onClick={() => handleWishlist(books)} className="btn btn-info">Wishlist</button> 
+            }
+            <div>
+              {
+                isBookInWishlist(id) ? <p><FaHeart size={30} className="text-red-600"></FaHeart></p> : <p><FaRegHeart size={30} /></p>
+              }
+            
+            </div>
             <Link to={`/details/${id}`}>
-            <button className="btn btn-primary">See Details</button>
+            <button className="btn btn-info">See Details</button>
             </Link>
+            
           </div>
         </div>
       </div>

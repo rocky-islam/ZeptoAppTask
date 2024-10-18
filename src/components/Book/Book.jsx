@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import SingleBook from "../SingleBook/SingleBook";
+import { addToLS, getStoreWishlist, removeFromLS } from "../../utilities/localstorage";
+import { AuthContext } from "../AuthProvider/AuthProvider";
 
 const Book = () => {
   const [allBooks, setAllBooks] = useState([]);
@@ -15,13 +17,15 @@ const Book = () => {
   //const numberOfPages = Math.ceil(count / itemsPerPage);
   const [totalPages, setTotalPages] = useState(1);
   const pages = [...Array(totalPages).keys()];
-  // console.log(itemsPerPage)
+  
 
-   //const [totalPages, setTotalPages] = useState(1);
+  //const [wishlist, setWishlist] = useState([]); // Wishlist state
+  const {wishlist, setWishlist} = useContext(AuthContext)
+  
 
 
   useEffect(() => {
-    fetch(`https://gutendex.com/books`)
+    fetch(`https://gutendex.com/books/?page=${currentPage}`)
       .then((res) => res.json())
       .then((data) => {
         setAllBooks(data.results);
@@ -29,8 +33,9 @@ const Book = () => {
         setFilteredBooks(data.results);
         setTotalPages(Math.ceil(data.results.length / itemsPerPage));
         setIsLoading(false);
+        
       });
-  }, [itemsPerPage]);
+  }, [itemsPerPage, currentPage]);
 
   const search = (e) => {
     setFilteredBooks(
@@ -40,13 +45,12 @@ const Book = () => {
     );
   };
 
-  useEffect(() =>{
+  useEffect(() => {
     const firstItemIndex = currentPage * itemsPerPage;
     const lastItemIndex = firstItemIndex + itemsPerPage;
     setFilteredBooks(allBooks.slice(firstItemIndex, lastItemIndex));
     //setIsLoading(false)
-  },[currentPage, itemsPerPage, allBooks])
-  
+  }, [currentPage, itemsPerPage, allBooks]);
 
   // Function to handle genre change and filter books
   const handleGenreChange = (e) => {
@@ -54,13 +58,23 @@ const Book = () => {
     setGenre(selectedGenre);
 
     if (selectedGenre === "all") {
-      setFilteredBooks(allBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)); // Show all books if 'All Genres' is selected
+      setFilteredBooks(
+        allBooks.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        )
+      ); // Show all books if 'All Genres' is selected
     } else {
       // Filter books by selected genre
       const filtered = allBooks.filter((book) =>
         book.subjects.some((subject) => subject.includes(selectedGenre))
       );
-      setFilteredBooks(filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage));
+      setFilteredBooks(
+        filtered.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        )
+      );
       setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     }
   };
@@ -70,6 +84,39 @@ const Book = () => {
   //     setCurrentPage(newPage);
   //   }
   // };
+
+  //wishlist
+  const handleWishlist = (book) =>{
+    const newWishlist = [...wishlist, book];
+    setWishlist(newWishlist)
+    addToLS(book.id)
+  }
+
+  const handleRemoveWishlist = id =>{
+    removeFromLS(id)
+  }
+
+  useEffect(() =>{
+    if(filteredBooks.length > 0){
+      const storeWishlist = getStoreWishlist();
+      console.log(storeWishlist);
+      const saveWishlist = [];
+      for(const id of storeWishlist){
+        console.log(id);
+        const filterBook = filteredBooks.find(filterBook => filterBook.id === id);
+        if(filterBook){
+          saveWishlist.push(filterBook)
+        }
+      }
+      setWishlist(saveWishlist);
+      console.log('wishlist', saveWishlist)
+    }
+  },[filteredBooks, setWishlist])
+
+   // Check if a book is in the wishlist
+   const isBookInWishlist = (bookId) => {
+    return wishlist.some(item => item.id === bookId);
+  };
 
   return (
     <>
@@ -95,8 +142,14 @@ const Book = () => {
           </div>
           {/* Filter */}
           <div className="flex justify-center items-center gap-2 my-8">
+            <p>wishlist {wishlist.length}</p>
             <label htmlFor="genre">Filter by Genre: </label>
-            <select id="genre" className="select select-info" value={genre} onChange={handleGenreChange}>
+            <select
+              id="genre"
+              className="select select-info"
+              value={genre}
+              onChange={handleGenreChange}
+            >
               <option value="all">All Genres</option>
               <option value="Fiction">Fiction</option>
               <option value="Fantasy">Fantasy</option>
@@ -113,30 +166,44 @@ const Book = () => {
           <div className="grid md:grid-cols-3 gap-5 justify-items-center my-14">
             {filteredBooks.length > 0 ? (
               filteredBooks.map((books) => (
-                <SingleBook key={books.id} books={books}></SingleBook>
+                <SingleBook 
+                  key={books.id} 
+                  books={books}
+                  handleWishlist={handleWishlist}
+                  handleRemoveWishlist={handleRemoveWishlist}
+                  isBookInWishlist={isBookInWishlist}
+                ></SingleBook>
               ))
             ) : (
               <p>No books founds</p>
             )}
           </div>
           <div className="flex items-center justify-center gap-2 mb-24">
-            
-            <button className={`btn btn-info`} onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage == 0} >
+            <button
+              className={`btn btn-info`}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage == 0}
+            >
               Prev
             </button>
 
-          {
-            pages.map(page => <button 
-              onClick={() => setCurrentPage(page)}
-              className={`btn btn-info`}
-              key={page}
-              >{page+1}</button>)
-          } 
+            {pages.map((page) => (
+              <button
+                onClick={() => setCurrentPage(page)}
+                className={`btn btn-info`}
+                key={page}
+              >
+                {page + 1}
+              </button>
+            ))}
 
-            <button className={`btn btn-info`} onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage == (totalPages - 1)} >
+            <button
+              className={`btn btn-info`}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage == totalPages - 1}
+            >
               Next
             </button>
-
           </div>
         </div>
       )}
