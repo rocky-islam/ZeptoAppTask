@@ -7,7 +7,7 @@ const SingleBook = ({ books, handleWishlist, handleRemoveWishlist, isBookInWishl
 //   console.log(books.authors[0].name)
   return (
     <div>
-      <div className="card bg-base-100 md:w-96 md:h-[560px] shadow-xl border">
+      <div className="card bg-base-100 w-96 md:w-80 xl:w-96 md:h-[560px] shadow-xl border">
         <figure>
           <img
           className=""

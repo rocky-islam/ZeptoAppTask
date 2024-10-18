@@ -18,7 +18,7 @@ const BookDetails = () => {
           />
           </div>
           <div>
-            <h1 className="text-5xl font-bold">{title}</h1>
+            <h1 className=" text-lg lg:text-5xl font-bold">{title}</h1>
             <p className="py-6">
               <strong>Authors:</strong> {authors[0].name} ({authors[0].birth_year} - {authors[0].death_year})
             </p>
@@ -34,7 +34,7 @@ const BookDetails = () => {
             <p>
                 <strong>Total Download:</strong> {download_count}
             </p>
-            <button className="btn btn-primary">Get Started</button>
+            
           </div>
         </div>
       </div>

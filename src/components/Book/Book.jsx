@@ -93,7 +93,9 @@ const Book = () => {
   }
 
   const handleRemoveWishlist = id =>{
-    removeFromLS(id)
+    const remainingWishlist = wishlist.filter(idx => idx.id !== id);
+    setWishlist(remainingWishlist);
+    removeFromLS(id);
   }
 
   useEffect(() =>{
@@ -142,7 +144,6 @@ const Book = () => {
           </div>
           {/* Filter */}
           <div className="flex justify-center items-center gap-2 my-8">
-            <p>wishlist {wishlist.length}</p>
             <label htmlFor="genre">Filter by Genre: </label>
             <select
               id="genre"
@@ -163,7 +164,7 @@ const Book = () => {
               See Your {filteredBooks.length} Books
             </h1>
           </div>
-          <div className="grid md:grid-cols-3 gap-5 justify-items-center my-14">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 justify-items-center md:my-14">
             {filteredBooks.length > 0 ? (
               filteredBooks.map((books) => (
                 <SingleBook 
@@ -178,7 +179,7 @@ const Book = () => {
               <p>No books founds</p>
             )}
           </div>
-          <div className="flex items-center justify-center gap-2 mb-24">
+          <div className="flex items-center justify-center gap-2 my-14">
             <button
               className={`btn btn-info`}
               onClick={() => setCurrentPage(currentPage - 1)}

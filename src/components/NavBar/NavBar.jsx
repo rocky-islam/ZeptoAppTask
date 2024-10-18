@@ -1,6 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { AuthContext } from "../AuthProvider/AuthProvider";
 
 const NavBar = () => {
+
+  const {wishlist} = useContext(AuthContext)
 
   const navLink = (
     <>
@@ -75,13 +79,15 @@ const NavBar = () => {
               {navLink}
             </ul>
           </div>
-          <a className="btn btn-ghost text-xl">daisyUI</a>
+          <Link to={'/'} className="btn btn-ghost md:text-xl">
+            Zepto Apps
+          </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">{navLink}</ul>
         </div>
         <div className="navbar-end">
-          <a className="btn">Button</a>
+          <a className="btn">Wishlist Item {wishlist.length}</a>
         </div>
       </div>
       <hr />
