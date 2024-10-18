@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import SingleBook from "../SingleBook/SingleBook";
 import { addToLS, getStoreWishlist, removeFromLS } from "../../utilities/localstorage";
 import { AuthContext } from "../AuthProvider/AuthProvider";
+//import { Fade } from "react-reveal";
 
 const Book = () => {
   const [allBooks, setAllBooks] = useState([]);
@@ -141,6 +142,9 @@ const Book = () => {
                 className="input input-bordered "
               />
             </label>
+          </div>
+          <div>
+            
           </div>
           {/* Filter */}
           <div className="flex justify-center items-center gap-2 my-8">
